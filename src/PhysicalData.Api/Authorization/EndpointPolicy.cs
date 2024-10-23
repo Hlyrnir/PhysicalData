@@ -6,6 +6,8 @@ namespace PhysicalData.Api.Authorization
 {
     public static class EndpointPolicy
     {
+        public const string Name = "ENDPOINT_PASSPORT";
+
         public static AuthorizationPolicy EndpointWithPassport()
         {
             var plcyBuilder = new AuthorizationPolicyBuilder();

@@ -1,12 +1,9 @@
-﻿namespace PhysicalData.Application.Filter
+﻿namespace PhysicalData.Contract.v01.Request.TimePeriod
 {
-    public class TimePeriodByFilterOption
+    public sealed class FindTimePeriodByFilterRequest : PagedRequest
     {
         public required Guid? PhysicalDimensionId { get; init; }
         public required double[]? Magnitude { get; init; }
         public required double? Offset { get; init; }
-
-        public int Page { get; init; } = 1;
-        public int PageSize { get; init; } = 10;
     }
 }

@@ -1,13 +1,22 @@
-﻿namespace PhysicalData.Api
+﻿using PhysicalData.Infrastructure;
+
+namespace PhysicalData.Api
 {
     public class PhysicalDataServiceCollectionBuilder
     {
+        public readonly IServiceCollection cltService;
+        public virtual IServiceCollection Services { get=>cltService; }
 
-        public virtual IServiceCollection Services { get; }
-
-        public PhysicalDataServiceCollectionBuilder(IServiceCollection clctService)
+        public PhysicalDataServiceCollectionBuilder(IServiceCollection cltService)
         {
-            Services = clctService;
+            this.cltService = cltService;
+        }
+
+        public PhysicalDataServiceCollectionBuilder AddSqliteDatabase(string sConnectionStringName)
+        {
+            cltService.AddSqliteDatabase(sConnectionStringName);
+
+            return new PhysicalDataServiceCollectionBuilder(Services);
         }
     }
 }

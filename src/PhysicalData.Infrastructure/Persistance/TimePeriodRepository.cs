@@ -107,11 +107,15 @@ namespace PhysicalData.Infrastructure.Persistance
 									[{TimePeriodColumn.PhysicalDimensionId}] 
 									FROM [{TimePeriodTable.TimePeriod}] 
 									WHERE (@PhysicalDimensionId IS NULL OR [{TimePeriodColumn.PhysicalDimensionId}] = @PhysicalDimensionId) 
+                                    AND (@Magnitude IS NULL OR [{TimePeriodColumn.Magnitude}] = @Magnitude) 
+                                    AND (@Offset IS NULL OR [{TimePeriodColumn.Offset}] = @Offset) 
 									LIMIT @PageSize 
 									OFFSET @PageOffset;";
 
                 DynamicParameters dpParameter = new DynamicParameters();
                 dpParameter.Add("PhysicalDimensionId", optFilter.PhysicalDimensionId);
+                dpParameter.Add("Magnitude", optFilter.Magnitude);
+                dpParameter.Add("Offset", optFilter.Offset);
                 dpParameter.Add("PageOffset", (optFilter.Page + (-1)) * optFilter.PageSize);
                 dpParameter.Add("PageSize", optFilter.PageSize);
 

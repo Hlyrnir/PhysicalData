@@ -10,18 +10,24 @@ using Passport.Api.Endpoint;
 using PhysicalData.Api;
 using PhysicalData.Api.Authorization;
 using PhysicalData.Api.DataProtection;
+using PhysicalData.Api.Endpoint;
 using PhysicalData.Api.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Text;
 
 WebApplicationBuilder webBuilder = WebApplication.CreateBuilder(args);
 
-webBuilder.Services.AddPassportServiceCollection<Guid>(prvService =>
+webBuilder.Services.AddPassport(prvService =>
 {
     IOptions<JwtTokenSetting> optJwtSetting = prvService.GetRequiredService<IOptions<JwtTokenSetting>>();
 
     return new JwtTokenHandler<Guid>(optJwtSetting.Value);
-}).AddSqliteDatabase(sConnectionStringName: "Passport");
+})
+    .Configure(optPassport=>
+    {
+        optPassport.TwoFactorAuthentication = false;
+    })
+    .AddSqliteDatabase(sConnectionStringName: "Passport");
 
 webBuilder.Services.AddPhysicalDataServiceCollection<Guid>()
     .AddSqliteDatabase(sConnectionStringName: "PhysicalData");
@@ -30,6 +36,7 @@ webBuilder.Services.AddPhysicalDataServiceCollection<Guid>()
 webBuilder.Services.AddOptions<PassportHashSetting>()
     .Bind(webBuilder.Configuration.GetSection(PassportHashSetting.SectionName))
     .ValidateOnStart();
+
 webBuilder.Services.AddScoped<IPassportHasher, PassportHasher>();
 
 // Add data protection
@@ -81,7 +88,7 @@ webBuilder.Services.AddAuthorization(optAuthorization =>
     .RequireAuthenticatedUser()
     .Build();
 
-    optAuthorization.AddPolicy(EndpointAuthorization.Passport, EndpointPolicy.EndpointWithPassport());
+    optAuthorization.AddPolicy(EndpointPolicy.Name, EndpointPolicy.EndpointWithPassport());
 });
 
 webBuilder.Services.AddApiVersioning(optVersion =>
@@ -133,5 +140,14 @@ webApplication.UseAuthorization();
 webApplication.AddEndpointVersionSet();
 
 webApplication.AddAuthenticationEndpoint();
+webApplication.AddPassportEndpoint(EndpointPolicy.Name);
+webApplication.AddPassportHolderEndpoint(EndpointPolicy.Name);
+webApplication.AddPassportTokenEndpoint(EndpointPolicy.Name);
+webApplication.AddPassportVisaEndpoint(EndpointPolicy.Name);
+
+webApplication.AddPhysicalDataEndpointVersionSet();
+
+webApplication.AddPhysicalDimensionEndpoint(EndpointPolicy.Name);
+webApplication.AddTimePeriodEndpoint(EndpointPolicy.Name);
 
 webApplication.Run();
